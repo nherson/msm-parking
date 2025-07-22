@@ -7,8 +7,8 @@ const BLOCKS = [
   "500",
   "600",
 ];
-const DAYLIGHTING_SPACES_LOST = 15;
-const PARKLET_SPACES_LOST = 10; // TODO make configurable
+// const DAYLIGHTING_SPACES_LOST = 15;
+// const PARKLET_SPACES_LOST = 10; // TODO make configurable
 
 export interface SimulationRunResult {
   mainStreetParking: MainStreetParking,

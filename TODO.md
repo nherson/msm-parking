@@ -14,3 +14,5 @@
   * Use Recharts lib to graph
   * Remove use of "willingness to pay" input
 * ~~Web worker implementation~~
+* Wire up subdomain (its free!)
+* Branding

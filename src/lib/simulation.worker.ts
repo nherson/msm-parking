@@ -1,5 +1,8 @@
 /// <reference lib="webworker" />
 
+const MIN_PERCENT_WILLING_TO_PAY = 10;
+const MAX_PERCENT_WILLING_TO_PAY = 30;
+
 interface EventPayload {
   cars: number;
   percentageWillingToPay: number;
@@ -12,17 +15,21 @@ self.onmessage = function (event: MessageEvent<EventPayload>) {
   console.log("Event percentageWillingToPay:", percentageWillingToPay);
   console.log("Event simulations:", simulations);
   console.log(new Simulator(200, 150, 0.5));
-  const data = new Array<SimulationData>();
-  // for (let w = 10; w < 30; w++) {
-  //   const simulator = new Simulator(event.data.cars, 150, w / 100);
-  //   data.push(simulator.run(10000));
-  // }
-  const simulator = new Simulator(cars, 150, percentageWillingToPay / 100); // TODO dont hardcode
-  const results = simulator.run(simulations);
-  console.log(results);
+  const resultSet = new Array<SimulationData>();
+
+  // Run simulation for every considered "willingness to pay for parking"
+  // to get a plottable range of results
+  for (
+    let w = MIN_PERCENT_WILLING_TO_PAY;
+    w < MAX_PERCENT_WILLING_TO_PAY;
+    w++
+  ) {
+    const simulator = new Simulator(event.data.cars, 150, w / 100);
+    resultSet.push(simulator.run(simulations));
+  }
   self.postMessage({
     msg: "Worker finished",
-    results: results,
+    results: resultSet,
   });
 };
 
@@ -42,6 +49,7 @@ export interface SimulationData {
   data: { [key: string]: number }; // average spots available on each block
   oddsOfParkingAvailableOnBlock: number;
   oddsOfParkingAvailableOnAdjacentBlock: number;
+  willingnessToPayPercent: number; // represented as a [0, 1] percent
 }
 
 class Simulator {
@@ -88,6 +96,7 @@ class Simulator {
       oddsOfParkingAvailableOnAdjacentBlock:
         results.filter((item) => item.canParkOnAdjacentBlock).length /
         results.length,
+      willingnessToPayPercent: this.paidParkingWillingness,
     };
   }
 

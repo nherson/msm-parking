@@ -16,3 +16,6 @@
 * ~~Web worker implementation~~
 * Wire up subdomain (its free!)
 * Branding
+* Tighten bands on number of cars downtown? (750-1500???)
+* Should probability of finding parking on an adjacent spot _include_ the target block?
+* Add vertical bars to graph indicating 2 reference surveys on parking preferences

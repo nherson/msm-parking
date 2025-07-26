@@ -17,10 +17,11 @@ import { Methodology } from "./components/Methodology";
 import type { SimulationData } from "./lib/simulation.worker";
 
 function App() {
-  const [cars, setCars] = useState(500);
-  const [percentageWillingToPay, setPercentageWillingToPay] = useState(50);
+  const [cars, setCars] = useState(1400);
   const [simulations, setSimulations] = useState(10000);
-  const [summary, setSummary] = useState<SimulationData | null>(null);
+  const [simulationDataSet, setSimulationDataSet] = useState<
+    SimulationData[] | null
+  >(null);
   const [showMethodology, { open: openMethodology, close: closeMethodology }] =
     useDisclosure(false);
   const [simulationRunning, setSimulationRunning] = useState(false);
@@ -37,14 +38,13 @@ function App() {
     worker.onmessage = (event) => {
       console.log("onmessage block");
       console.log(event.data);
-      setSummary(event.data.results);
+      setSimulationDataSet(event.data.results);
       setSimulationRunning(false);
-      worker.terminate(); // Clean up
+      worker.terminate();
     };
 
     worker.postMessage({
       cars: cars,
-      percentageWillingToPay: percentageWillingToPay,
       simulations: simulations,
     });
     console.log("sent message");
@@ -101,39 +101,6 @@ function App() {
         </Stack>
 
         <Stack my="sm">
-          <Text>
-            Percent of drivers willing to pay to park: {percentageWillingToPay}%
-          </Text>
-          <Slider
-            value={percentageWillingToPay}
-            onChange={setPercentageWillingToPay}
-            min={0}
-            max={100}
-            step={1}
-          />
-          <Group grow>
-            <Button
-              variant="filled"
-              onClick={() => setPercentageWillingToPay(12)}
-            >
-              ParkMobile Survey
-            </Button>
-            <Button
-              variant="filled"
-              onClick={() => setPercentageWillingToPay(30)}
-            >
-              USDOT Figure
-            </Button>
-            <Button
-              variant="filled"
-              onClick={() => setPercentageWillingToPay(100)}
-            >
-              No Free Parking
-            </Button>
-          </Group>
-        </Stack>
-
-        <Stack my="sm">
           <Text>Number of Simulations</Text>
           <NumberInput
             value={simulations}
@@ -150,10 +117,10 @@ function App() {
           Run Simulation
         </Button>
 
-        {summary !== null && (
-          <Container size="md" style={{ padding: "2rem" }}>
-            <SimulationResults result={summary} />
-          </Container>
+        {simulationDataSet !== null && (
+          <Stack my="sm">
+            <SimulationResults simulationData={simulationDataSet} />
+          </Stack>
         )}
         <Methodology opened={showMethodology} onClose={closeMethodology} />
       </Stack>
